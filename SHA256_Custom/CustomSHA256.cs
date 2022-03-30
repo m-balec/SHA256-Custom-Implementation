@@ -15,14 +15,14 @@ namespace SHA256_Custom
         private static byte[] prepareChunks(string phrase)
         {
             char[] letters;
-            byte[] bytes, ubytes;
+            byte[] messageBytes, ubytes;
             int arraySize, numOfChunks;
             UInt64 phraseLength = (uint)phrase.Length * 8;
 
 
             // Converting phrase to byte array
             letters = phrase.ToCharArray();
-            bytes = Encoding.ASCII.GetBytes(letters);
+            messageBytes = Encoding.ASCII.GetBytes(letters);
 
 
             // Getting num of bits and chunks
@@ -40,11 +40,11 @@ namespace SHA256_Custom
             // Filling entire message schedule
             for (int i = 0; i < arraySize; i++)
             {
-                if (i <= bytes.Length - 1)
+                if (i <= messageBytes.Length - 1)
                 {
-                    ubytes[i] = bytes[i];
+                    ubytes[i] = messageBytes[i];
                 }
-                else if (i == bytes.Length)
+                else if (i == messageBytes.Length)
                 {
                     ubytes[i] = 0x80; // 128 or 0b10000000 or (1 << 7)
                 }
