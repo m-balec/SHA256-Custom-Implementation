@@ -15,20 +15,18 @@ namespace SHA256_Custom
         private static byte[] prepareChunks(string phrase)
         {
             char[] letters;
-            byte[] bytes, ubytes;
-            string[] substrings;
-            int arraySize, numOfChunks, substringIndex;
-            float numOfBits;
-            string padding64Bit;
+            byte[] messageBytes, ubytes;
+            int arraySize, numOfChunks;
+            UInt64 phraseLength = (uint)phrase.Length * 8;
+
 
             // Converting phrase to byte array
             letters = phrase.ToCharArray();
-            bytes = Encoding.ASCII.GetBytes(letters);
+            messageBytes = Encoding.ASCII.GetBytes(letters);
 
 
             // Getting num of bits and chunks
-            numOfBits = bytes.Length * 8;
-            numOfChunks = (int)Math.Ceiling((decimal)((numOfBits + 64) / 512));
+            numOfChunks = (int)Math.Ceiling((decimal)(((float)phraseLength + 64) / 512));
 
 
             // Determining size of array based on num of chunks
@@ -39,46 +37,29 @@ namespace SHA256_Custom
             ubytes = new byte[arraySize];
 
 
-            // Length of original phrase in 64-bit binary
-            padding64Bit = Convert.ToString(phrase.Length * 8, 2).PadLeft(64, '0');
-
-
-            // Array to hold smaller substrings of full 64 bit string
-            substrings = new string[8];
-
-
-            // Seperate index to set ubytes array final 64 bits to the correct substrings -> converted to byte
-            substringIndex = 0;
-
-
-            // For loop to break up the 64-bit message length into 8 substrings of 8 bits
-            for (int i = 0; i < substrings.Length; i++)
-            {
-                int startingIndex = i * 8;
-                string subStr = padding64Bit.Substring(startingIndex, 8);
-                substrings[i] = subStr;
-            }
-
-
+            // Filling entire message schedule
             for (int i = 0; i < arraySize; i++)
             {
-                if (i <= bytes.Length - 1)
+                if (i <= messageBytes.Length - 1)
                 {
-                    ubytes[i] = bytes[i];
+                    ubytes[i] = messageBytes[i];
                 }
-                else if (i == bytes.Length)
+                else if (i == messageBytes.Length)
                 {
-                    ubytes[i] = 0x80;
+                    ubytes[i] = 0x80; // 128 or 0b10000000 or (1 << 7)
                 }
                 else if (i < arraySize - 8)
                 {
                     ubytes[i] = 0x0; // NOTHING
                 }
-                else if (i < arraySize)
+                else
                 {
-                    // Filling final 64 bits (8 bits at a time) with the 64-bit padding that is broken down into substrings
-                    ubytes[i] = Convert.ToByte(substrings[substringIndex], 2);
-                    substringIndex++;
+                    int left_offset = 64 - (8 * (64 - i)),
+                        right_offset = 56;
+
+                    if (i == 8) left_offset = 0;
+
+                    ubytes[i] = Convert.ToByte((phraseLength << left_offset) >> right_offset);
                 }
             }
 
