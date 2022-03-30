@@ -22,8 +22,19 @@ namespace SHA256_Custom
             // Returns: ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb
 
 
+
             // TESTING: all phrases
+            Console.WriteLine(Test.EvaluateHash(phrases));
+            // Returns: TRUE (All phrases tested match the returned hash values of a reputable source, System.Security.Cryptography library)
+
+
+            // TESTING: Single phrase, hashed once
             Console.WriteLine(Test.EvaluateHash(phrase3));
+            // Returns: TRUE (All phrases tested match the returned hash values of a reputable source, System.Security.Cryptography library)
+
+
+            // TESTING: Single phrase, re-hashed multiple times
+            Console.WriteLine(Test.EvaluateHash(phrase3, 64));
             // Returns: TRUE (All phrases tested match the returned hash values of a reputable source, System.Security.Cryptography library)
         }
     }
